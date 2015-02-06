@@ -7,14 +7,8 @@ TiddlPy
 """
 
 from bs4 import BeautifulSoup
-#from urllib import urlopen
-#from urllib.request import urlopen
-#import parsedatetime
-#import datetime
 import re
 import shutil
-
-#validtypes = ['text/vnd.tiddlywiki', 'text/plain']
 
 
 def tid2dict(tiddler):
@@ -38,7 +32,6 @@ def loadtiddlers(wiki, tidnames='_loadall'):
     matchedtiddlers=[]
     for t in tiddlers:
         if t['title'] in tidnames or tidnames=='_loadall':
-#        if (t['title'] in tidnames or tidnames=='_loadall') and t['type'] in validtypes:
             matchedtiddlers.append(tid2dict(t))
     return matchedtiddlers
 
@@ -106,7 +99,6 @@ def wikiedit(wiki, tiddlers, deletelist, modi='python'):
         for line in fhi:
             if re.search('^<div', line):
                 enddiv=False
- #               title = re.split('title="',line)[1].split('"')[0]
                 title = re.findall('title=".*?"',line)[0][7:-1]
                 if len(title)<=0:
                     print('title not found')
@@ -116,7 +108,6 @@ def wikiedit(wiki, tiddlers, deletelist, modi='python'):
                     continue
                 deletedlist.append(title)
                 for linex in fhi:
-#                    fho.write(linex)
                     if re.search('^</div>', linex):
                         enddiv=True
                         break
