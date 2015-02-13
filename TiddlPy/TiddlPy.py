@@ -9,6 +9,7 @@ TiddlPy
 from bs4 import BeautifulSoup
 import re
 import shutil
+from time import strftime
 
 
 def tid2dict(tiddler):
@@ -84,6 +85,7 @@ def wikiedit(wiki, tiddlers, deletelist, modi='python'):
     savelist=[]
     writtenlist=[]
     deletedlist=[]
+    created={}
     for t in tiddlers:
         savelist.append(t['title'])
     with open(wiki) as fhi, open('temp__.html', 'w') as fho:
@@ -107,8 +109,11 @@ def wikiedit(wiki, tiddlers, deletelist, modi='python'):
                     fho.write(line)
                     continue
                 deletedlist.append(title)
-                for linex in fhi:
-                    if re.search('^</div>', linex):
+                if re.search('created=".*?"',line):
+                    createddate = re.findall('created=".*?"',line)[0][9:-1]
+                    created[title]=createddate
+                for line2 in fhi:
+                    if re.search('^</div>', line2):
                         enddiv=True
                         break
             elif re.search('^</div>', line):
@@ -125,6 +130,11 @@ def wikiedit(wiki, tiddlers, deletelist, modi='python'):
 
         for tiddler in tiddlers:
             tiddler['modifier'] = modi
+            tiddler['modified'] = strftime('%Y%m%d%H%M%S')
+            if tiddler['title'] not in deletedlist:
+                tiddler['created'] = tiddler['modified']
+            elif created.has_key(tiddler['title']):
+                tiddler['created'] = created[tiddler['title']]                
             fho.write('<div')
             for key in tiddler:
                 if key == 'text':
@@ -140,8 +150,6 @@ def wikiedit(wiki, tiddlers, deletelist, modi='python'):
 
     shutil.copyfile('temp__.html',wiki)
     return (writtenlist, deletedlist)
-
-
 
 
 
