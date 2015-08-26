@@ -7,8 +7,6 @@ TiddlPy
 """
 
 from bs4 import BeautifulSoup
-#from urllib import urlopen
-#from urllib.request import urlopen
 #import parsedatetime
 #import datetime
 import re
@@ -20,7 +18,7 @@ from time import strftime
 
 def tid2dict(tiddler):
     dict=tiddler.attrs
-    dict['text']=tiddler.text
+    dict[u'text']=tiddler.text
     return dict
 
 def loadtiddlers(wiki, tidnames='_loadall'):
@@ -33,14 +31,14 @@ def loadtiddlers(wiki, tidnames='_loadall'):
     tiddlernames specified as a list of strings. If not supplied, load all
     ordinary tiddlers in storeArea.
     """
-    twsoup = BeautifulSoup(open(wiki))
+    twsoup = BeautifulSoup(open(wiki, mode='rb'))
     storearea=twsoup.find('div', id="storeArea")
     tiddlers=storearea('div')
     matchedtiddlers=[]
 
     for t in tiddlers:
 #        print (len(t), t['title'], len(tiddlers))
-        if (t.has_attr('title') and t['title'] in tidnames) or tidnames=='_loadall':
+        if (t.has_attr(u'title') and t[u'title'] in tidnames) or tidnames=='_loadall':
 #        if (t['title'] in tidnames or tidnames=='_loadall') and t['type'] in validtypes:
             matchedtiddlers.append(tid2dict(t))
     return matchedtiddlers
@@ -58,7 +56,7 @@ def findtiddlers(wiki, tidnames='_loadall'):
     foundtiddlers = loadtiddlers(wiki, tidnames)
     foundlist=[]
     for t in foundtiddlers:
-        foundlist.append(t['title'])
+        foundlist.append(t[u'title'])
     return foundlist
 
 def searchtiddlers(wiki, srchtxt, fieldlist, caseinsensitive=True):
@@ -75,12 +73,12 @@ def searchtiddlers(wiki, srchtxt, fieldlist, caseinsensitive=True):
     for t in alltiddlers:
         for f in fieldlist:
             if t.has_key(f) and re.search(srchtxt, t[f], re.I if caseinsensitive else 0):
-                matchlist.append(t['title'])
+                matchlist.append(t[u'title'])
                 break
     return matchlist
 
 
-def wikiedit(wiki, tiddlers, deletelist, modi='python'):
+def wikiedit(wiki, tiddlers, deletelist, modi=u'python'):
     """
     wiki is the wikifilename
 
@@ -96,10 +94,11 @@ def wikiedit(wiki, tiddlers, deletelist, modi='python'):
     deletedlist=[]
     created={}
     for t in tiddlers:
-        savelist.append(t['title'])
-    with open(wiki) as fhi, open('temp__.html', 'w') as fho:
+        savelist.append(t[u'title'])
+    with open(wiki, 'br') as fhi, open('temp__.html', 'bw') as fho:
         for line in fhi:
-            if re.search('^<div id="storeArea"', line):
+            if re.search('^<div id="storeArea"', line.decode('utf-8')):
+####            if re.search('^<div id="storeArea"', line):
                 fho.write(line)
                 break
             fho.write(line)
@@ -107,7 +106,13 @@ def wikiedit(wiki, tiddlers, deletelist, modi='python'):
             print('Store area not found')
             raise SystemExit
         enddiv=False
+#        print('xxxxxxx')
         for line in fhi:
+            try:
+                line.decode('utf-8')
+            except:
+                print (line)
+        for line in [ll.decode('utf-8') for ll in fhi]:
             if re.search('^<div', line):
                 enddiv=False
  #               title = re.split('title="',line)[1].split('"')[0]
@@ -175,6 +180,12 @@ def wikiedit(wiki, tiddlers, deletelist, modi='python'):
     return (writtenlist, deletedlist,ttt)
 
 
+def try_utf8(data):
+    "Returns a Unicode object on success, or None on failure"
+    try:
+       return data.decode('utf-8')
+    except UnicodeDecodeError:
+       return None
 
 
 
@@ -182,9 +193,10 @@ if __name__ == "__main__":
     print ('Test of TiddlPy module')
 
     wiki = r"C:\Users\Neil\Dropbox\TiddlyWiki\NewsReaderTW5.1.8pre.html"
+    wiki = r"C:\Users\neil.griffin\Documents\Dropbox\TiddlyWiki\NewsReaderTW5.1.9x.html"
     modi = 'NeilPy'
 
-    tidnames = ['Home Page', 'Test1', 'update']
+    tidnames = ['Cambridge News Articles', 'Test1', 'update']
 
     tiddlers = loadtiddlers(wiki, tidnames)
 #    tiddlers = loadtiddlers(wiki)
@@ -201,3 +213,6 @@ if __name__ == "__main__":
 #    newtid.append({'title':'newtid4','text':'newtid text\nhello world', 'tags':'newtidtag'})
 #    a,b=wikiedit(wiki, newtid, ['newtid1'], modi)
 #    print ("deleted:{}\nwritten:{}".format(b,a))
+
+
+

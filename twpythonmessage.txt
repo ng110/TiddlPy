@@ -1,0 +1,23 @@
+TW5 and Python
+
+A little over a year ago, I discovered both TW and Python and since then, it seems that the solution to pretty much every problem has been to use one or other of them.  It was only a matter of time before I felt the need to get them working together.
+
+As a result, I have written a little Python module that allows me to perform the essential functions of reading, searching and writing to tiddlers in the store area of a local single-file TiddlyWiki.  I thought this might be of interest to some others here, so I have put it up on Github for people to play with if they like.  There appears to have been something similar for TW Classic, but I've not seen anything for TW5.
+
+PLEASE NOTE: Because this has the ability to edit a TW file and overwrite the original, there may well be unforeseen side-effects that I have not yet discovered, so BACK UP any valuable data before using.  There are quite likely to be bugs, so I make no claims for the reliability.
+
+	
+So far, it has works well for me in my first application, which is as a news reader.  I am scraping news pages from the website of my local newspaper (which is horribly overloaded with intrusive adverts) and dropping them into a dedicated TiddlyWiki.  A scheduled task runs my Python script to keep it regularly updated.
+
+The ability to automate moving data in and out of a local TW file opens up all sorts of possibilities.  Here are some ideas:
+- Extracting information from websites for formatting/viewing/searching etc in TW
+- Tools for importing various data formats into TW
+- Exchanging information between different TW files 
+- Communicating between different computers (using a file synchronised with Dropbox etc).  This could allow you to use TW on one device as a control panel that sends instructions / reads data from one or more remote machines that might be controlling an experiments / a home security system, etc.
+- New WikiText markup that provides instructions to an external Python script.  For example, it could instruct the script to download an image or other file from a specified URL, drop the file into a local directory and then replace the markup with a link to the saved file.
+
+
+I would be interested to know if anyone finds this useful, or if they can spot any potential problems in writing to a TW file in this way.  Obviously there is the risk of lost changes if Python tries to write at the same time as someone is editing, though this already exists as a problem when using a file synchronised between different computers.
+
+
+
