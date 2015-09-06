@@ -31,7 +31,7 @@ def loadtiddlers(wiki, tidnames='_loadall'):
     tiddlernames specified as a list of strings. If not supplied, load all
     ordinary tiddlers in storeArea.
     """
-    twsoup = BeautifulSoup(open(wiki, mode='rb'))
+    twsoup = BeautifulSoup(open(wiki, mode='rb'), "html.parser")
     storearea=twsoup.find('div', id="storeArea")
     tiddlers=storearea('div')
     matchedtiddlers=[]
@@ -177,7 +177,7 @@ def wikiedit(wiki, tiddlers, deletelist, modi=u'python'):
         # end 'with'
 
     shutil.copyfile('temp__.html',wiki)
-    return (writtenlist, deletedlist,ttt)
+    return (writtenlist, deletedlist)
 
 
 def try_utf8(data):
@@ -194,6 +194,7 @@ if __name__ == "__main__":
 
     wiki = r"C:\Users\Neil\Dropbox\TiddlyWiki\NewsReaderTW5.1.8pre.html"
     wiki = r"C:\Users\neil.griffin\Documents\Dropbox\TiddlyWiki\NewsReaderTW5.1.9x.html"
+    wiki = r"C:\Users\Neil\Documents\test\NewsReaderTW5.1.9 test_2.html"
     modi = 'NeilPy'
 
     tidnames = ['Cambridge News Articles', 'Test1', 'update']
