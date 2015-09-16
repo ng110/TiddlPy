@@ -7,11 +7,9 @@ TiddlPy
 """
 
 from bs4 import BeautifulSoup
-#import parsedatetime
-#import datetime
 import re
 import shutil
-from time import strftime
+from time import strftime, gmtime
 
 #validtypes = ['text/vnd.tiddlywiki', 'text/plain']
 
@@ -37,7 +35,6 @@ def loadtiddlers(wiki, tidnames='_loadall'):
     matchedtiddlers=[]
 
     for t in tiddlers:
-#        print (len(t), t['title'], len(tiddlers))
         if (t.has_attr(u'title') and t[u'title'] in tidnames) or tidnames=='_loadall':
 #        if (t['title'] in tidnames or tidnames=='_loadall') and t['type'] in validtypes:
             matchedtiddlers.append(tid2dict(t))
@@ -80,15 +77,17 @@ def searchtiddlers(wiki, srchtxt, fieldlist, caseinsensitive=True):
 
 def wikiedit(wiki, tiddlers, deletelist, modi=u'python'):
     """
-    wiki is the wikifilename
+    wiki is the wikifilename.
 
     Deletes tiddlers in the deletelist and the tiddlers list, if they currently
     exist, then writes the tiddlers list, adding/replacing the modifier
-    attribute with the specified or default value.
+    attribute with the specified or default value.  Timestamps modified and/or
+    created dates in UTC.
 
     Returns (writtenlist, deletedlist) - list of tiddlers successfully deleted
-    and written
+    and written.
     """
+    encoding='utf-8'    
     savelist=[]
     writtenlist=[]
     deletedlist=[]
@@ -98,53 +97,35 @@ def wikiedit(wiki, tiddlers, deletelist, modi=u'python'):
     with open(wiki, 'br') as fhi, open('temp__.html', 'bw') as fho:
         for line in fhi:
             if re.search('^<div id="storeArea"', line.decode('utf-8')):
-####            if re.search('^<div id="storeArea"', line):
                 fho.write(line)
                 break
             fho.write(line)
         else:
             print('Store area not found')
-            raise SystemExit
+            raise SystemError
         enddiv=False
-#        print('xxxxxxx')
-        for line in fhi:
-            try:
-                line.decode('utf-8')
-            except:
-                print (line)
-        for line in [ll.decode('utf-8') for ll in fhi]:
-            if re.search('^<div', line):
-                enddiv=False
- #               title = re.split('title="',line)[1].split('"')[0]
-                if len(re.findall('title=".*?"',line))<1:
-                    print ('xx',line)
-                title = re.findall('title=".*?"',line)[0][7:-1]
-                if len(title)<=0:
-                    print('title not found in tiddler', line)  ##############################
-#                    continue
-                    raise SystemExit
 
-##                if 'Trinity' in title:
-##                    ttt=title
-##                if title not in savelist:
-##                    fho.write(line)
-##                    continue
-##                if title not in deletelist:
-##                    fho.write(line)
-##                    continue
-                if title not in deletelist and title not in savelist:   ### not recognising £, " in deletelist entries
+        for line in fhi:
+            if re.search(b'^<div', line):
+                enddiv=False
+                if len(re.findall(b'title=".*?"',line))<1:
+                    print ('xx',line)
+                title = re.findall(b'title=".*?"',line)[0][7:-1]
+                if len(title)<=0:
+                    print('title not found in tiddler', line)
+                    raise SystemError
+                if title not in deletelist and title not in savelist:
                     fho.write(line)
                     continue
                 deletedlist.append(title)
-                if re.search('created=".*?"',line):
-                    createddate = re.findall('created=".*?"',line)[0][9:-1]
+                if re.search(b'created=".*?"',line):
+                    createddate = re.findall(b'created=".*?"',line)[0][9:-1]
                     created[title]=createddate
                 for line2 in fhi:
-#                    fho.write(line2)
-                    if re.search('^</div>', line2):
+                    if re.search(b'^</div>', line2):
                         enddiv=True
                         break
-            elif re.search('^</div>', line):
+            elif re.search(b'^</div>', line):
                 if enddiv==True:
                     break
                 else:
@@ -155,23 +136,25 @@ def wikiedit(wiki, tiddlers, deletelist, modi=u'python'):
         else:
             print ('end of Store area not found')
             raise SystemExit
+#            raise TWError
 
         for tiddler in tiddlers:
             tiddler['modifier'] = modi
-            tiddler['modified'] = strftime('%Y%m%d%H%M%S')
+            tiddler['modified'] = strftime('%Y%m%d%H%M%S',gmtime())
             if tiddler['title'] not in deletedlist:
                 tiddler['created'] = tiddler['modified']
             elif created.has_key(tiddler['title']):
                 tiddler['created'] = created[tiddler['title']]
-            fho.write('<div')
+            fho.write(b'<div')
             for key in tiddler:
                 if key == 'text':
                     continue
-                fho.write(' '+key+'="'+tiddler[key]+'"')
-            fho.write('>\n<pre>{}</pre>\n</div>\n'.format(tiddler['text']))
+                fho.write(b' ' + bytes(key,encoding)
+                          + b'="' + bytes(tiddler[key],encoding) + b'"')
+            fho.write('>\n<pre>{}</pre>\n</div>\n'.format(tiddler['text']).encode(encoding))
             writtenlist.append(tiddler['title'])
 
-        fho.write(line)  # delayed write of library modules line
+        fho.write(line)  # delayed write of </div> line at end of storearea
         for line in fhi:
             fho.write(line)
         # end 'with'
@@ -180,40 +163,8 @@ def wikiedit(wiki, tiddlers, deletelist, modi=u'python'):
     return (writtenlist, deletedlist)
 
 
-def try_utf8(data):
-    "Returns a Unicode object on success, or None on failure"
-    try:
-       return data.decode('utf-8')
-    except UnicodeDecodeError:
-       return None
-
 
 
 if __name__ == "__main__":
-    print ('Test of TiddlPy module')
-
-    wiki = r"C:\Users\Neil\Dropbox\TiddlyWiki\NewsReaderTW5.1.8pre.html"
-    wiki = r"C:\Users\neil.griffin\Documents\Dropbox\TiddlyWiki\NewsReaderTW5.1.9x.html"
-    wiki = r"C:\Users\Neil\Documents\test\NewsReaderTW5.1.9 test_2.html"
-    modi = 'NeilPy'
-
-    tidnames = ['Cambridge News Articles', 'Test1', 'update']
-
-    tiddlers = loadtiddlers(wiki, tidnames)
-#    tiddlers = loadtiddlers(wiki)
-    print(len(tiddlers))
-
-#    tlist = findtiddlers(wiki, tidnames)
-#    tlist = findtiddlers(wiki)
-#    print(len(tlist), tlist)
-
-#    tlist = searchtiddlers(wiki, 'tpt', ['title', 'tags'], True)
-#    print(len(tlist), tlist)
-
-#    newtid=[]
-#    newtid.append({'title':'newtid4','text':'newtid text\nhello world', 'tags':'newtidtag'})
-#    a,b=wikiedit(wiki, newtid, ['newtid1'], modi)
-#    print ("deleted:{}\nwritten:{}".format(b,a))
-
-
+    print ('TiddlPy module for Python v3.x')
 
