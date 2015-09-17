@@ -115,11 +115,9 @@ def wikiedit(wiki, tiddlers, deletelist, modi=u'python'):
                 if len(title)<=0:
                     print('title not found in tiddler', line)
                     raise SystemError
-####                print (type(title.decode(encoding)),type(savelist[0]))
                 if title not in deletelist and title not in savelist:
                     fho.write(line)
                     continue
-#####                print("append to deletedlist:",title)
                 deletedlist.append(title)
                 if re.search(b'created=".*?"',line):
                     createddate = re.findall(b'created=".*?"',line)[0][9:-1]
@@ -139,7 +137,6 @@ def wikiedit(wiki, tiddlers, deletelist, modi=u'python'):
         else:
             print ('end of Store area not found')
             raise SystemExit
-#            raise TWError
 
         for tiddler in tiddlers:
             tiddler['modifier'] = modi
@@ -147,13 +144,11 @@ def wikiedit(wiki, tiddlers, deletelist, modi=u'python'):
             if tiddler['title'] not in deletedlist:
                 tiddler['created'] = tiddler['modified']
             elif tiddler['title'] in created:
-#####            elif created.has_key(tiddler['title']):
                 tiddler['created'] = created[tiddler['title']].decode(encoding)
             fho.write(b'<div')
             for key in tiddler:
                 if key == 'text':
                     continue
-                print(key, tiddler[key], type(key), type(tiddler[key]))
                 fho.write(b' ' + bytes(key,encoding)
                           + b'="' + bytes(tiddler[key],encoding) + b'"')
             fho.write('>\n<pre>{}</pre>\n</div>\n'.format(tiddler['text']).encode(encoding))
