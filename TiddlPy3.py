@@ -96,7 +96,7 @@ def wikiedit(wiki, tiddlers, deletelist, modi=u'python'):
         savelist.append(t[u'title'])
     with open(wiki, 'br') as fhi, open('temp__.html', 'bw') as fho:
         for line in fhi:
-            if re.search('^<div id="storeArea"', line.decode('utf-8')):
+            if re.search('^<div id="storeArea"', line.decode(encoding)):
                 fho.write(line)
                 break
             fho.write(line)
@@ -111,13 +111,15 @@ def wikiedit(wiki, tiddlers, deletelist, modi=u'python'):
                 if len(re.findall(b'title=".*?"',line))<1:
                     print ('error - no title in line: ',line)
                     raise SystemError
-                title = re.findall(b'title=".*?"',line)[0][7:-1]
+                title = (re.findall(b'title=".*?"',line)[0][7:-1]).decode(encoding)
                 if len(title)<=0:
                     print('title not found in tiddler', line)
                     raise SystemError
+####                print (type(title.decode(encoding)),type(savelist[0]))
                 if title not in deletelist and title not in savelist:
                     fho.write(line)
                     continue
+#####                print("append to deletedlist:",title)
                 deletedlist.append(title)
                 if re.search(b'created=".*?"',line):
                     createddate = re.findall(b'created=".*?"',line)[0][9:-1]
@@ -144,12 +146,14 @@ def wikiedit(wiki, tiddlers, deletelist, modi=u'python'):
             tiddler['modified'] = strftime('%Y%m%d%H%M%S',gmtime())
             if tiddler['title'] not in deletedlist:
                 tiddler['created'] = tiddler['modified']
-            elif created.has_key(tiddler['title']):
-                tiddler['created'] = created[tiddler['title']]
+            elif tiddler['title'] in created:
+#####            elif created.has_key(tiddler['title']):
+                tiddler['created'] = created[tiddler['title']].decode(encoding)
             fho.write(b'<div')
             for key in tiddler:
                 if key == 'text':
                     continue
+                print(key, tiddler[key], type(key), type(tiddler[key]))
                 fho.write(b' ' + bytes(key,encoding)
                           + b'="' + bytes(tiddler[key],encoding) + b'"')
             fho.write('>\n<pre>{}</pre>\n</div>\n'.format(tiddler['text']).encode(encoding))
