@@ -109,7 +109,8 @@ def wikiedit(wiki, tiddlers, deletelist, modi=u'python'):
             if re.search(b'^<div', line):
                 enddiv=False
                 if len(re.findall(b'title=".*?"',line))<1:
-                    print ('xx',line)
+                    print ('error - no title in line: ',line)
+                    raise SystemError
                 title = re.findall(b'title=".*?"',line)[0][7:-1]
                 if len(title)<=0:
                     print('title not found in tiddler', line)
