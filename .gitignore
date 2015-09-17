@@ -1,3 +1,6 @@
+__pycache__/
+twpythonmessage.txt
+*.pyc
 
 # Windows image file caches
 Thumbs.db
