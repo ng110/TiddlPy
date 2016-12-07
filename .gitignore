@@ -2,6 +2,7 @@ __pycache__/
 twpythonmessage.txt
 *.pyc
 .cache/
+TiddlPy.egg-info/
 
 # Windows image file caches
 Thumbs.db

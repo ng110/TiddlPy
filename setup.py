@@ -12,7 +12,7 @@ setup(name='TiddlPy',
       author_email='ngriffin@gmail.com',
       license='GPL',   # MIT, BSD
       packages=['TiddlPy'],
-      long_description=read('README.md'),
+#      long_description=read('README.md'),
 #      keywords = ["photos"],
       classifiers=[
           "Development Status :: 2 - Pre-Alpha",
