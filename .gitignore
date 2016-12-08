@@ -1,4 +1,5 @@
 __pycache__/
+tests/__pycache__/
 twpythonmessage.txt
 *.pyc
 .cache/

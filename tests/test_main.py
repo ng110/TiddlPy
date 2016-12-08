@@ -1,10 +1,10 @@
-import pytest
+	import pytest
 import requests
 
 from TiddlPy import loadtiddlers, searchtiddlers, findtiddlers, wikiedit
 
 
-@pytest.fixture(scope=session)
+@pytest.fixture(scope="session")
 def tiddlywikidotcom():
     filename = 'tempfile.html'
     r = requests.get('http://tiddlywiki.com')
@@ -13,22 +13,35 @@ def tiddlywikidotcom():
     yield(filename)
     # remove file
 
-@pytest.fixture(scope=class)
-def dummywiki():
-    pass
+	
+@pytest.fixture
+def tempwifkifile(scope="class"):
+    wikifilecopy = 'copyfilename.html'
+    # copy example
+    yield wikifilecopy
+    #delete copy
+
 
 class TestReading():
     def test_reading1(tiddlywikidotcom):
         pass
     def test_reading2(tiddlywikidotcom):
         pass
+    def test_readtextfield(self):
+        assert 1
+    def test_readauthorfield(self):
+        assert 1
 
 class TestWriting():
     def test_writing1(tiddlywikidotcom):
         pass
     def test_writing2(tiddlywikidotcom):
         pass
-
+    def test_readtextfield(self):
+        assert 1
+    def test_readauthorfield(self):
+        assert 1
+		
 class TestIntegrity():
     def test_integrity1(tiddlywikidotcom):
         pass
@@ -36,4 +49,3 @@ class TestIntegrity():
         pass
 
 
-    
