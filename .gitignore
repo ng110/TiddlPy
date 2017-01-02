@@ -3,6 +3,8 @@ twpythonmessage.txt
 *.pyc
 .cache/
 TiddlPy.egg-info/
+.hypothesis/
+tempfile.html
 
 # Windows image file caches
 Thumbs.db
