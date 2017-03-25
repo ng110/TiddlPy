@@ -75,7 +75,7 @@ def searchtiddlers(wiki, srchtxt, fieldlist, caseinsensitive=True):
     matchlist = []
     for tid in alltiddlers:
         for field in fieldlist:
-            if tid.has_key(field) and re.search(srchtxt, tid[field],
+            if field in tid and re.search(srchtxt, tid[field],
                                                 re.I if caseinsensitive else 0):
                 matchlist.append(tid[u'title'])
                 break
