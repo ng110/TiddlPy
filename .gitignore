@@ -6,6 +6,7 @@ twpythonmessage.txt
 TiddlPy.egg-info/
 .hypothesis/
 tempfile.html
+old files/.gitignore.bak
 
 # Windows image file caches
 Thumbs.db
